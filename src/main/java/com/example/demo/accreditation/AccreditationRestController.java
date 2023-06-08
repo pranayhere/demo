@@ -11,12 +11,15 @@ import java.util.List;
 
 @RestController
 public class AccreditationRestController {
+    AccreditationService accreditationService;
 
     @Autowired
-    AccreditationRestService accreditationService;
+    public AccreditationRestController(AccreditationService accreditationService) {
+        this.accreditationService = accreditationService;
+    }
 
     @RequestMapping(value = "/rest/accreditation_list.go", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-        public ResponseEntity<List<AccreditationJsonBean>> getAccreditationList() {
+        public ResponseEntity<List<AccreditationJsonBean>> listAccreditation() {
 
         try {
             List<Accreditation> accreditations = accreditationService.getAll();

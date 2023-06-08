@@ -13,28 +13,36 @@ import java.util.List;
 
 @Service
 public class AccreditationRestService implements AccreditationService {
-
-    @Autowired
     private AccreditationDao accreditationDao;
-
-    @Autowired
     private DocumentTypeDao documentTypeDao;
-
-    @Autowired
     private Environment environment;
 
+    private final static String ACCREDITATION_IMAGES = "accreditation_images";
+    private final static String DOT = ".";
+
+    @Autowired
+    public AccreditationRestService(AccreditationDao accreditationDao, DocumentTypeDao documentTypeDao, Environment environment) {
+        this.accreditationDao = accreditationDao;
+        this.documentTypeDao = documentTypeDao;
+        this.environment = environment;
+    }
+
+    @Override
     public List<Accreditation> getAll() {
         Accreditation filterAccreditation = new Accreditation();
         filterAccreditation.setActiveFlag(true);
-        return accreditationDao.getAllByFilter(filterAccreditation); // changed name
+        return accreditationDao.getAllByFilter(filterAccreditation);
     }
 
     @Override
     public List<AccreditationJsonBean> toJsonBean(List<Accreditation> accreditationList) {
         List<AccreditationJsonBean> accreditationJson = new ArrayList<>();
-        for (Accreditation accreditation : accreditationList) {
-            accreditationJson.add(accreditation.toJsonBean(getImagePath(accreditation)));
-        }
+
+        System.out.println("printing list " + accreditationList);
+
+        accreditationList.stream()
+                .map(accreditation -> accreditation.toJsonBean(getImagePath(accreditation)))
+                .forEach(accreditationJson::add);
 
         return accreditationJson;
     }
@@ -47,8 +55,8 @@ public class AccreditationRestService implements AccreditationService {
         }
 
         if (documentType != null) {
-            imagePath = environment.getAttachmentPath() + File.separatorChar + "accreditation_images" + File.separatorChar + accreditation.getAccreditationId()
-                    + File.separatorChar + accreditation.getAccreditationId() + "." + accreditation.getImageType();
+            imagePath = environment.getAttachmentPath() + File.separatorChar + ACCREDITATION_IMAGES + File.separatorChar + accreditation.getAccreditationId()
+                    + File.separatorChar + accreditation.getAccreditationId() + DOT + accreditation.getImageType();
         }
 
         return imagePath;
